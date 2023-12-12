@@ -468,8 +468,7 @@ class API:
             sort_order=sort_order,
             start_date=start_date,
             station_id=station_id,
-            units=units,
-            _full_time=True
+            units=units
         )
 
     def _call_api(
@@ -489,8 +488,7 @@ class API:
         sort_field: Optional[str] = None,
         sort_order: Optional[str] = "asc",
         station_id: Optional[Union[str, list, tuple]] = None,
-        units: Optional[str] = "metric",
-        _full_time: bool = False
+        units: Optional[str] = "metric"
     ) -> dict:
         _ids_1 = [
             dataset_id,
@@ -525,10 +523,7 @@ class API:
                 raise ValueError(
                     "start_date has to be on ISO date format") from error
 
-            if _full_time:
-                start_date = start_date.isoformat() + "T" + start_date.strftime("%H:%M:%S")
-            else:
-                start_date = start_date.isoformat()
+            start_date = start_date.date().isoformat()
 
         if end_date is not None:
             if not isinstance(end_date, (str, datetime.datetime)):
@@ -541,10 +536,7 @@ class API:
                 raise ValueError(
                     "end_date has to be on ISO date format") from error
 
-            if _full_time:
-                end_date = end_date.isoformat() + "T" + end_date.strftime("%H:%M:%S")
-            else:
-                end_date = end_date.isoformat()
+            end_date = end_date.date().isoformat()
 
         if not isinstance(include_metadata, bool):
             raise TypeError("include_metadata should be a boolean type value")
@@ -621,10 +613,16 @@ class API:
             return json.loads(response.read())
 
 
-noaaobj = NOAA("HKuVxxFuvyCdInqZJjGnQgYSHCNZcZLv")
+if __name__ == "__main__":
+    noaaobj = API("HKuVxxFuvyCdInqZJjGnQgYSHCNZcZLv")
 
-print(noaaobj.get_data(
-    dataset_id="GSOM",
-    start_date="1970-10-03",
-    end_date="2012-09-10")
-)
+    try:
+        print(noaaobj.get_data(
+            dataset_id="GSOM",
+            start_date="2012-08-01",
+            end_date="2012-09-10")
+        )
+    except Exception as error:
+        if isinstance(error, urllib.error.HTTPError):
+            print(error.code)
+            print(str(error.read()))
