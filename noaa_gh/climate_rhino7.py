@@ -1,39 +1,20 @@
-"""
-Source code for API implementation
-MIT License
-Copyright (c) 2022 Andreas Sagen
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-"""
-
+import sys
 import datetime
 import json
-import urllib.parse
-import urllib.request
-from typing import Optional, Union
+import urllib
 
-
-class API:
+class NOAAAPI:
     """Class for interfacing with NOAA climate data API
 
     :param key: Access token from NOAA
     :type key: str
     """
 
-    def __init__(self, key: str):
+    def __init__(self, key):
+        """
+        :type key: str
+        :param key: Access token from NOAA
+        """
         self._api_header = {
             "token": key
         }
@@ -41,17 +22,17 @@ class API:
 
     def get_datasets(
         self,
-        dataset_id: Optional[str] = None,
-        data_type_id: Optional[Union[str, list, tuple]] = None,
-        location_id: Optional[Union[str, list, tuple]] = None,
-        station_id: Optional[Union[str, list, tuple]] = None,
-        start_date: Optional[str] = None,
-        end_date: Optional[str] = None,
-        sort_field: Optional[str] = None,
-        sort_order: Optional[str] = "asc",
-        limit: Optional[int] = 25,
-        offset: Optional[int] = 0
-    ) -> dict:
+        dataset_id = None,
+        data_type_id = None,
+        location_id = None,
+        station_id = None,
+        start_date = None,
+        end_date = None,
+        sort_field = None,
+        sort_order = "asc",
+        limit = 25,
+        offset = 0
+    ):
         """Get list of available datasets in CDO or info on a specific dataset
 
         :param dataset_id: Identification to dataset in CDO, defaults to None
@@ -84,7 +65,7 @@ class API:
 
         endpoint = "datasets"
         if dataset_id is not None:
-            endpoint += f"/{dataset_id}"
+            endpoint += "/{dataset_id}".format(dataset_id=dataset_id)
 
         return self._call_api(
             endpoint=endpoint,
@@ -101,17 +82,17 @@ class API:
 
     def get_data_categories(
         self,
-        category_id: Optional[str] = None,
-        dataset_id: Optional[Union[str, list, tuple]] = None,
-        location_id: Optional[Union[str, list, tuple]] = None,
-        station_id: Optional[Union[str, list, tuple]] = None,
-        start_date: Optional[str] = None,
-        end_date: Optional[str] = None,
-        sort_field: Optional[str] = None,
-        sort_order: Optional[str] = "asc",
-        limit: Optional[int] = 25,
-        offset: Optional[int] = 0
-    ) -> dict:
+        category_id = None,
+        dataset_id = None,
+        location_id = None,
+        station_id = None,
+        start_date = None,
+        end_date = None,
+        sort_field = None,
+        sort_order = "asc",
+        limit = 25,
+        offset = 0
+    ):
         """Get list of available categories in CDO or info on a specific category
 
         :param category_id: Identification to category in CDO, defaults to None
@@ -145,7 +126,7 @@ class API:
 
         endpoint = "datacategories"
         if category_id is not None:
-            endpoint += f"/{category_id}"
+            endpoint += "/{category_id}".format(category_id=category_id)
 
         return self._call_api(
             endpoint=endpoint,
@@ -162,18 +143,18 @@ class API:
 
     def get_data_types(
         self,
-        type_id: Optional[str] = None,
-        dataset_id: Optional[Union[str, list, tuple]] = None,
-        location_id: Optional[Union[str, list, tuple]] = None,
-        station_id: Optional[Union[str, list, tuple]] = None,
-        data_category_id: Optional[Union[str, list, tuple]] = None,
-        start_date: Optional[str] = None,
-        end_date: Optional[str] = None,
-        sort_field: Optional[str] = None,
-        sort_order: Optional[str] = "asc",
-        limit: Optional[int] = 25,
-        offset: Optional[int] = 0
-    ) -> dict:
+        type_id = None,
+        dataset_id = None,
+        location_id = None,
+        station_id = None,
+        data_category_id = None,
+        start_date = None,
+        end_date = None,
+        sort_field = None,
+        sort_order = "asc",
+        limit = 25,
+        offset = 0
+    ):
         """Get list of available datatypes in CDO or info on a specific datatype
 
         :param type_id: Identification to type in CDO, defaults to None
@@ -209,7 +190,7 @@ class API:
 
         endpoint = "datatypes"
         if type_id is not None:
-            endpoint += f"/{type_id}"
+            endpoint += "/{type_id}".format(type_id=type_id)
 
         return self._call_api(
             endpoint=endpoint,
@@ -227,15 +208,15 @@ class API:
 
     def get_location_categories(
         self,
-        location_category_id: Optional[str] = None,
-        dataset_id: Optional[Union[str, list, tuple]] = None,
-        start_date: Optional[str] = None,
-        end_date: Optional[str] = None,
-        sort_field: Optional[str] = None,
-        sort_order: Optional[str] = "asc",
-        limit: Optional[int] = 25,
-        offset: Optional[int] = 0
-    ) -> dict:
+        location_category_id = None,
+        dataset_id = None,
+        start_date = None,
+        end_date = None,
+        sort_field = None,
+        sort_order = "asc",
+        limit = 25,
+        offset = 0
+    ):
         """Get list of available location categories in CDO or info on a specific location category
 
         :param location_category_id: Identification to location category in CDO, defaults to None
@@ -266,7 +247,8 @@ class API:
 
         endpoint = "locationcategories"
         if location_category_id is not None:
-            endpoint += f"/{location_category_id}"
+            endpoint += "/{location_category_id}".format(
+                location_category_id=location_category_id)
 
         return self._call_api(
             endpoint=endpoint,
@@ -281,17 +263,17 @@ class API:
 
     def get_locations(
         self,
-        location_id: Optional[str] = None,
-        dataset_id: Optional[Union[str, list, tuple]] = None,
-        location_category_id: Optional[Union[str, list, tuple]] = None,
-        data_category_id: Optional[Union[str, list, tuple]] = None,
-        start_date: Optional[str] = None,
-        end_date: Optional[str] = None,
-        sort_field: Optional[str] = None,
-        sort_order: Optional[str] = "asc",
-        limit: Optional[int] = 25,
-        offset: Optional[int] = 0
-    ) -> dict:
+        location_id = None,
+        dataset_id = None,
+        location_category_id = None,
+        data_category_id = None,
+        start_date = None,
+        end_date = None,
+        sort_field = None,
+        sort_order = "asc",
+        limit = 25,
+        offset = 0
+    ):
         """Get list of available locations in CDO or info on a specific location
 
         :param location_id: Identification to location in CDO, defaults to None
@@ -325,7 +307,7 @@ class API:
 
         endpoint = "locations"
         if location_id is not None:
-            endpoint += f"/{location_id}"
+            endpoint += "/{location_id}".format(location_id=location_id)
 
         return self._call_api(
             endpoint=endpoint,
@@ -342,19 +324,19 @@ class API:
 
     def get_stations(
         self,
-        station_id: Optional[str] = None,
-        dataset_id: Optional[Union[str, list, tuple]] = None,
-        location_id: Optional[Union[str, list, tuple]] = None,
-        data_category_id: Optional[Union[str, list, tuple]] = None,
-        data_type_id: Optional[Union[str, list, tuple]] = None,
-        extent: Optional[str] = None,
-        start_date: Optional[str] = None,
-        end_date: Optional[str] = None,
-        sort_field: Optional[str] = None,
-        sort_order: Optional[str] = "asc",
-        limit: Optional[int] = 25,
-        offset: Optional[int] = 0
-    ) -> dict:
+        station_id = None,
+        dataset_id = None,
+        location_id = None,
+        data_category_id = None,
+        data_type_id = None,
+        extent = None,
+        start_date = None,
+        end_date = None,
+        sort_field = None,
+        sort_order = "asc",
+        limit = 25,
+        offset = 0
+    ):
         """Get list of available stations in CDO or info on a specific station
 
         :param station_id: Identification to station in CDO, defaults to None
@@ -392,7 +374,7 @@ class API:
 
         endpoint = "stations"
         if station_id is not None:
-            endpoint += f"/{station_id}"
+            endpoint += "/{station_id}".format(station_id=station_id)
 
         return self._call_api(
             endpoint=endpoint,
@@ -411,19 +393,19 @@ class API:
 
     def get_data(
         self,
-        dataset_id: Union[str, datetime.datetime],
-        start_date: Union[str, datetime.datetime],
-        end_date: Union[str, datetime.datetime],
-        data_type_id: Optional[Union[str, list, tuple]] = None,
-        location_id: Optional[Union[str, list, tuple]] = None,
-        station_id: Optional[Union[str, list, tuple]] = None,
-        units: Optional[str] = "metric",
-        sort_field: Optional[str] = None,
-        sort_order: Optional[str] = "asc",
-        limit: Optional[int] = 25,
-        offset: Optional[int] = 0,
-        include_metadata: Optional[bool] = False
-    ) -> dict:
+        dataset_id,
+        start_date,
+        end_date,
+        data_type_id = None,
+        location_id = None,
+        station_id = None,
+        units = "metric",
+        sort_field = None,
+        sort_order = "asc",
+        limit = 25,
+        offset = 0,
+        include_metadata = False
+    ):
         """Get available data in CDO
 
         :param dataset_id: Identification to dataset in CDO
@@ -468,28 +450,30 @@ class API:
             sort_order=sort_order,
             start_date=start_date,
             station_id=station_id,
-            units=units
+            units=units,
+            _full_time=False
         )
 
     def _call_api(
         self,
-        endpoint: str,
-        dataset_id: Optional[Union[str, list, tuple]] = None,
-        data_type_id: Optional[Union[str, list, tuple]] = None,
-        data_category_id: Optional[Union[str, list, tuple]] = None,
-        start_date: Optional[str] = None,
-        end_date: Optional[str] = None,
-        extent: Optional[str] = None,
-        include_metadata: Optional[bool] = False,
-        limit: Optional[int] = 25,
-        location_id: Optional[Union[str, list, tuple]] = None,
-        location_category_id: Optional[Union[str, list, tuple]] = None,
-        offset: Optional[int] = 0,
-        sort_field: Optional[str] = None,
-        sort_order: Optional[str] = "asc",
-        station_id: Optional[Union[str, list, tuple]] = None,
-        units: Optional[str] = "metric"
-    ) -> dict:
+        endpoint,
+        dataset_id = None,
+        data_type_id = None,
+        data_category_id = None,
+        start_date = None,
+        end_date = None,
+        extent = None,
+        include_metadata = False,
+        limit = 25,
+        location_id = None,
+        location_category_id = None,
+        offset = 0,
+        sort_field = None,
+        sort_order = "asc",
+        station_id = None,
+        units = "metric",
+        _full_time = False
+    ):
         _ids_1 = [
             dataset_id,
             data_type_id,
@@ -501,42 +485,15 @@ class API:
 
         for _id in _ids_1:
             if not isinstance(_id, (str, list, tuple)) and _id is not None:
-                raise TypeError(f"{_id} should be string or array type value")
+                raise TypeError("{_id} should be string or array type value".format(_id=_id))
 
             if isinstance(_id, (list, tuple)):
                 for value in _id:
                     if not isinstance(value, str):
-                        raise TypeError(
-                            f"All values in {_id} should be string type values")
+                        raise TypeError("All values in {_id} should be string type values".format(_id=_id))
 
         if not isinstance(extent, str) and extent is not None:
             raise TypeError("Extent has to be a string type value")
-
-        if start_date is not None:
-            if not isinstance(start_date, (str, datetime.datetime)):
-                raise TypeError(
-                    "start_date has to be given as a string or datetime type value")
-
-            try:
-                start_date = datetime.datetime.fromisoformat(start_date)
-            except ValueError as error:
-                raise ValueError(
-                    "start_date has to be on ISO date format") from error
-
-            start_date = start_date.date().isoformat()
-
-        if end_date is not None:
-            if not isinstance(end_date, (str, datetime.datetime)):
-                raise TypeError(
-                    "end_date has to be given as a string or datetime type value")
-
-            try:
-                end_date = datetime.datetime.fromisoformat(end_date)
-            except ValueError as error:
-                raise ValueError(
-                    "end_date has to be on ISO date format") from error
-
-            end_date = end_date.date().isoformat()
 
         if not isinstance(include_metadata, bool):
             raise TypeError("include_metadata should be a boolean type value")
@@ -556,19 +513,22 @@ class API:
 
         if sort_field not in [None, "id", "name",
                               "mindate", "maxdate", "datacoverage"]:
-            raise ValueError(f"{sort_field} is not an accepted value")
+            raise ValueError("{sort_field} is not an accepted value".format(
+                sort_field=sort_field))
 
         if not isinstance(sort_order, str):
             raise TypeError("sort_order should be an string type value")
 
         if sort_order not in ["asc", "desc"]:
-            raise ValueError(f"{sort_field} is not an accepted value")
+            raise ValueError("{sort_field} is not an accepted value".format(
+                sort_field=sort_order))
 
         if not isinstance(units, str):
             raise TypeError("units should be an string type value")
 
         if units not in ["standard", "metric"]:
-            raise ValueError(f"{units} is not an accepted value")
+            raise ValueError("{units} is not an accepted value".format(
+                units=units))
 
         if isinstance(dataset_id, (list, tuple)):
             dataset_id = "&".join(dataset_id)
@@ -602,27 +562,25 @@ class API:
 
         data = {key: value for key, value in data.items() if value is not None}
 
-        url = urllib.parse.urljoin(self._host, endpoint)
-        params = urllib.parse.urlencode(data, safe="")
-
-        request = urllib.request.Request(
-            url="?".join([url, params]).replace("%26", "&"),
-            headers=self._api_header, method="GET")
-
-        with urllib.request.urlopen(request) as response:
-            return json.loads(response.read())
-
+        url = self._host + endpoint
+        params = urllib.urlencode(data)
+        
+        urlOpener = urllib.URLopener()
+        for k, v in self._api_header.items():
+            urlOpener.addheader(k, v)
+            
+        response = urlOpener.open("?".join([url, params]).replace("%26", "&"))
+        
+        return json.loads(response.read())
 
 if __name__ == "__main__":
-    noaaobj = API("HKuVxxFuvyCdInqZJjGnQgYSHCNZcZLv")
-
-    try:
-        print(noaaobj.get_data(
-            dataset_id="GSOM",
-            start_date="2012-08-01",
-            end_date="2012-09-10")
-        )
-    except Exception as error:
-        if isinstance(error, urllib.error.HTTPError):
-            print(error.code)
-            print(str(error.read()))
+    noaaobj = NOAAAPI("HKuVxxFuvyCdInqZJjGnQgYSHCNZcZLv")
+    
+   print(noaaobj.get_data(
+       dataset_id="GSOM",
+       start_date="2012-01-03",
+       end_date="2012-09-10")
+   )
+    
+    sys.modules["NOAAAPI"] = NOAAAPI
+    print("Successfully Initialized")

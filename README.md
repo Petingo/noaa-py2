@@ -1,88 +1,24 @@
-# NOAA Climate Data Online SDK for Python
+# NOAA Climate Data Online SDK for Rhino & Grasshopper
 
-Python API for NOAA climate data.
+Python 2 API for NOAA climate data API v2.
 
-## Getting started
+The [original repositories](https://github.com/topics/noaa-api) by _Andreas Sagen_ required `python 3.7`.
+This fork target supporting for `python 2.7`, which is compitable with Rhino 7. The modified file can be found in `noaa_gh`. the alternation includes:
 
-### Prerequisites
+- Clear Python3 style type hint
+- Change f-string to `str.format()`
+- Replace `urllib.request` by `urllib.URLopener`
+- Disable `startdate` and `enddate` rephasing because it makes the system crush.
 
-To use this interface you need:
+In the same folder, there is another `noaa_example.gh` for usage reference.
 
-- `python 3.7+`
+## However
+I suggest not to use this NOAAv2 API unless you really need it to be a RESTful competiable.
+Otherwise, use v1 and parse the `.csv` by yourself. The disadvantage in v2 includes:
 
-For development you additionaly need:
+1. Maximun duration for each query is one year, e.g. `startdate=1990-01-01` and `enddate=1991-02-02` would be unavailable. If you want to query data for a long period, you may consider break it into multiple query and run a for-loop for it. However, there's a maximum capacity of 5 query/second for each token...
 
-- `sphinx`
-
-### Installing
-
-#### Intall using pip from source:
-
-Install latest available source using
-
-```
-python -m pip install git+https://github.com/exTerEX/noaa.git#egg=noaa
-```
-
-Or install specific version (tag, commit, branch) available using
-
-```
-python -m pip install git+https://github.com/exTerEX/noaa.git@<branch/commit hash/tag>#egg=noaa
-```
-
-where `<branch/commit hash/tag>` is changed out for a specific branch (e.g. main, development), commit hash (e.g. 86ba995, 770f02), or tag (e.g. 0.1.0-alpha, 1.17.6)
-
-#### Install using pip from tarball:
-
-Install latest available source using
-
-```
-python -m pip install git+https://github.com/exTerEX/noaa/tarball/main
-```
-
-### Usage
-
-Below is a simple example on how to use this API. Get a token from [NOAA](https://www.ncdc.noaa.gov/cdo-web/token) and input it into where `<token>` in the example below.
-
-```python
-from noaa.climate import API
-
-noaaobj = API("<token>")
-
-print(noaaobj.get_datasets())
-print(noaaobj.get_data(
-        dataset_id = "GSOM",
-        start_date="1970-10-03",
-        end_date="2012-09-10")
-)
-print(noaaobj.get_data_categories())
-print(noaaobj.get_data_types())
-print(noaaobj.get_locations())
-print(noaaobj.get_stations())
-```
-
-See [documentation](https://www.ncdc.noaa.gov/cdo-web/webservices/v2) for an in-depth explanation of input values.
-
-### Running tests
-
-Run the tests in the CMD using the line under, with a valid token.
-
-```console
-python tests/climate.py <token>
-```
-
-## Contributing
-
-Please read [CONTRIBUTING](https://github.com/exTerEX/noaa/blob/main/.github/CONTRIBUTING.md) for details on our code of conduct, and the process for submitting pull requests to us.
-
-## Versioning
-
-This project use [PEP440](https://peps.python.org/pep-0440/) for versioning. For the versions available, see the [tags](https://github.com/exTerEX/noaa/tags) on this repository.
-
-## Authors
-
-- _Andreas Sagen_ - Initial contributer
+2. The server is not stable. It always fails, which is extremely annoying.
 
 ## License
-
 This project is licensed under the `MIT`. For more details see [LICENSE](LICENSE).
